@@ -1,2 +1,10 @@
-# commanding.js
- A Discord.JS Command Handler to handle commands eaiser
+# TABLE OF CONTENTS
+
+- [Installation](#installation)
+
+# Installation
+
+**NPM**
+```bash
+npm i commanding.js
+```
