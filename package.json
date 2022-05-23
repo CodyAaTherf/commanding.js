@@ -2,7 +2,7 @@
   "name": "commanding.js",
   "version": "1.0.0",
   "description": "A Discord.JS Command Handler to handle commands eaiser",
-  "main": "src/index.js",
+  "main": "src/index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
