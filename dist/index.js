@@ -28,7 +28,8 @@ var commandingjs = /** @class */ (function () {
         }
         this._commandsDir = commandsDir || this._commandsDir;
         this._listenersDir = listenerDir || this._listenersDir;
-        new CommandHandler_1.default(this, client, this._commandsDir);
+        // new CommandHandler(this , client , this._commandsDir)
+        this._commandHandler = new CommandHandler_1.default(this, client, this._commandsDir);
         if (this._listenersDir) {
             new ListenerHandler_1.default(client, this._listenersDir);
         }
@@ -65,6 +66,20 @@ var commandingjs = /** @class */ (function () {
     commandingjs.prototype.getPrefix = function (guild) {
         return this._prefixes[guild ? guild.id : ''] || this._defaultPrefix;
     };
+    Object.defineProperty(commandingjs.prototype, "commands", {
+        get: function () {
+            return this._commandHandler.commands;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(commandingjs.prototype, "commandAmount", {
+        get: function () {
+            return this.commands.length;
+        },
+        enumerable: false,
+        configurable: true
+    });
     return commandingjs;
 }());
 module.exports = commandingjs;
