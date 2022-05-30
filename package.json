@@ -1,0 +1,30 @@
+{
+  "name": "commanding.js",
+  "version": "1.1.0",
+  "description": "A Discord.JS Command Handler to handle commands eaiser",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CodyAaTherf/commanding.js.git"
+  },
+  "keywords": [
+    "Discord.js",
+    "discord",
+    "commandhandler",
+    "commanding",
+    "commands",
+    "commandingjs"
+  ],
+  "author": "AaTherf",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CodyAaTherf/commanding.js/issues"
+  },
+  "homepage": "https://github.com/CodyAaTherf/commanding.js#readme",
+  "dependencies": {
+    "discord.js": "^13.7.0"
+  }
+}
