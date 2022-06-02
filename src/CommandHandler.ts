@@ -13,10 +13,6 @@ class CommandHandler {
     constructor(instance: commandingjs , client: Client , dir: string){
         if(dir){
             if(fs.existsSync(dir)){
-                // const files = fs
-                //     .readdirSync(dir)
-                //     .filter((file: string) => file.endsWith('.js'))
-
                 const files = getAllFiles(dir)
                 const amount = files.length
 
@@ -32,7 +28,6 @@ class CommandHandler {
                         fileName = fileName.split('.')[0].toLowerCase()
 
                         const configuration = require(file)
-                        // const { aliases , callback } = configuration
                         const{
                             name ,
                             commands ,
@@ -40,6 +35,8 @@ class CommandHandler {
                             callback ,
                             execute ,
                             description ,
+                            minArgs ,
+                            maxArgs ,
                         } = configuration
 
                         if(callback && execute){
@@ -59,14 +56,6 @@ class CommandHandler {
                         if(names && !names.includes(name.toLowerCase())){
                             names.unshift(name.toLowerCase())
                         }
-
-                        // if(aliases && aliases.length && callback){
-                        //     const command = new Command(instance , client , configuration)
-
-                        //     for(const alias of aliases){
-                        //         this._commands.set(alias.toLowerCase() , command)
-                        //     }
-                        // }
 
                         if(!names.includes(fileName)){
                             names.unshift(fileName)
@@ -94,16 +83,29 @@ class CommandHandler {
 
                         if(content.startsWith(prefix)){
                             content = content.substring(prefix.length)
-                            const words = content.split(/ /g)
-                            const firstElement = words.shift()
+                            const args = content.split(/ /g)
+                            const firstElement = args.shift()
 
                             if(firstElement){
-                                const alias = firstElement.toLowerCase()
+                                const name = firstElement.toLowerCase()
 
-                                const command = this._commands.get(alias)
+                                const command = this._commands.get(name)
 
                                 if(command){
-                                    command.execute(message , words)
+                                    // command.execute(message , args)
+                                    const { minArgs , maxArgs } = command
+
+                                    if(minArgs !== undefined && args.length < minArgs){
+                                        message.reply('Not enough Args specified')
+                                        return
+                                    }
+
+                                    if(maxArgs !== undefined && maxArgs !== -1 && args.length > maxArgs){
+                                        message.reply('Too many Args specified.')
+                                        return
+                                    }
+
+                                    command.execute(message , args)
                                 }
                             }
                         }
