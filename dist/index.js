@@ -4,8 +4,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 var CommandHandler_1 = __importDefault(require("./CommandHandler"));
 var ListenerHandler_1 = __importDefault(require("./ListenerHandler"));
+var mongo_1 = __importDefault(require("./mongo"));
 var commandingjs = /** @class */ (function () {
     function commandingjs(client, commandsDir, listenerDir) {
+        var _this = this;
         this._defaultPrefix = '>';
         this._commandsDir = 'commands';
         this._listenersDir = '';
@@ -33,6 +35,14 @@ var commandingjs = /** @class */ (function () {
         if (this._listenersDir) {
             new ListenerHandler_1.default(client, this._listenersDir);
         }
+        setTimeout(function () {
+            if (_this._mongo) {
+                (0, mongo_1.default)(_this._mongo);
+            }
+            else {
+                console.warn("MongoDB connection URI isn't provided , some features might not work!");
+            }
+        }, 500);
     }
     Object.defineProperty(commandingjs.prototype, "mongoPath", {
         get: function () {

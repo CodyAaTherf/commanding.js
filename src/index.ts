@@ -2,6 +2,7 @@ import { Client , Guild } from 'discord.js'
 import CommandHandler from './CommandHandler'
 import ListenerHandler from './ListenerHandler'
 import ICommand from './interfaces/ICommand'
+import mongo from './mongo'
 
 class commandingjs {
     private _defaultPrefix = '>'
@@ -41,6 +42,14 @@ class commandingjs {
         if(this._listenersDir){
             new ListenerHandler(client , this._listenersDir)
         }
+
+        setTimeout(() => {
+            if(this._mongo){
+                mongo(this._mongo)
+            } else{
+                console.warn("MongoDB connection URI isn't provided , some features might not work!")
+            }
+        } , 500)
     }
 
     public get mongoPath(): string{
