@@ -12,6 +12,7 @@ var commandingjs = /** @class */ (function () {
         this._commandsDir = 'commands';
         this._listenersDir = '';
         this._mongo = '';
+        this._syntaxError = 'Wrong Syntax!';
         this._prefixes = {};
         if (!client) {
             throw new Error("Discord.jS Client isn't defined.");
@@ -53,6 +54,17 @@ var commandingjs = /** @class */ (function () {
     });
     commandingjs.prototype.setMongoPath = function (mongoPath) {
         this._mongo = mongoPath;
+        return this;
+    };
+    Object.defineProperty(commandingjs.prototype, "syntaxError", {
+        get: function () {
+            return this._syntaxError;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    commandingjs.prototype.setSyntaxError = function (syntaxError) {
+        this._syntaxError = syntaxError;
         return this;
     };
     Object.defineProperty(commandingjs.prototype, "prefixes", {

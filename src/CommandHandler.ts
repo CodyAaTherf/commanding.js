@@ -93,15 +93,33 @@ class CommandHandler {
 
                                 if(command){
                                     // command.execute(message , args)
-                                    const { minArgs , maxArgs } = command
+                                    // const { minArgs , maxArgs } = command
 
-                                    if(minArgs !== undefined && args.length < minArgs){
-                                        message.reply('Not enough Args specified')
-                                        return
-                                    }
+                                    // if(minArgs !== undefined && args.length < minArgs){
+                                    //     message.reply('Not enough Args specified')
+                                    //     return
+                                    // }
 
-                                    if(maxArgs !== undefined && maxArgs !== -1 && args.length > maxArgs){
-                                        message.reply('Too many Args specified.')
+                                    const { minArgs , maxArgs , expectedArgs } = command
+                                    let { syntaxError = instance.syntaxError } = command
+
+                                    // if(maxArgs !== undefined && maxArgs !== -1 && args.length > maxArgs){
+                                    //     message.reply('Too many Args specified.')
+                                    //     return
+                                    // }
+
+                                    if(
+                                        (minArgs !== undefined && args.length < minArgs) ||
+                                        (maxArgs !== undefined && maxArgs !== -1 && args.length > maxArgs)
+                                    ){
+                                        if(syntaxError){
+                                            syntaxError = syntaxError.replace(/{PREFIX}/g , prefix)
+                                        }
+
+                                        syntaxError = syntaxError.replace(/{COMMAND}/g , name)
+                                        syntaxError = syntaxError.replace(/ {ARGUMENTS}/g , expectedArgs ? ` ${expectedArgs}` : '')
+
+                                        message.reply(syntaxError)
                                         return
                                     }
 

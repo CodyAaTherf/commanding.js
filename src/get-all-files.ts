@@ -7,7 +7,7 @@ const getAllFiles = (dir: string) => {
     for(const file of files){
         if(file.isDirectory()){
             jsFiles = [...jsFiles , ...getAllFiles(`${dir}/${file.name}`)]
-        } else {
+        } else if(file.name.endsWith('.js')){
             jsFiles.push(`${dir}/${file.name}`)
         }
     }

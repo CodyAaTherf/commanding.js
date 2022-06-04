@@ -20,7 +20,7 @@ var getAllFiles = function (dir) {
         if (file.isDirectory()) {
             jsFiles = __spreadArray(__spreadArray([], jsFiles, true), getAllFiles(dir + "/" + file.name), true);
         }
-        else {
+        else if (file.name.endsWith('.js')) {
             jsFiles.push(dir + "/" + file.name);
         }
     }

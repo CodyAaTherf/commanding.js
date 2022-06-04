@@ -65,13 +65,25 @@ var CommandHandler = /** @class */ (function () {
                                 var command = _this._commands.get(name_3);
                                 if (command) {
                                     // command.execute(message , args)
-                                    var minArgs = command.minArgs, maxArgs = command.maxArgs;
-                                    if (minArgs !== undefined && args.length < minArgs) {
-                                        message.reply('Not enough Args specified');
-                                        return;
-                                    }
-                                    if (maxArgs !== undefined && maxArgs !== -1 && args.length > maxArgs) {
-                                        message.reply('Too many Args specified.');
+                                    // const { minArgs , maxArgs } = command
+                                    // if(minArgs !== undefined && args.length < minArgs){
+                                    //     message.reply('Not enough Args specified')
+                                    //     return
+                                    // }
+                                    var minArgs = command.minArgs, maxArgs = command.maxArgs, expectedArgs = command.expectedArgs;
+                                    var _a = command.syntaxError, syntaxError = _a === void 0 ? instance.syntaxError : _a;
+                                    // if(maxArgs !== undefined && maxArgs !== -1 && args.length > maxArgs){
+                                    //     message.reply('Too many Args specified.')
+                                    //     return
+                                    // }
+                                    if ((minArgs !== undefined && args.length < minArgs) ||
+                                        (maxArgs !== undefined && maxArgs !== -1 && args.length > maxArgs)) {
+                                        if (syntaxError) {
+                                            syntaxError = syntaxError.replace(/{PREFIX}/g, prefix);
+                                        }
+                                        syntaxError = syntaxError.replace(/{COMMAND}/g, name_3);
+                                        syntaxError = syntaxError.replace(/ {ARGUMENTS}/g, expectedArgs ? " " + expectedArgs : '');
+                                        message.reply(syntaxError);
                                         return;
                                     }
                                     command.execute(message, args);

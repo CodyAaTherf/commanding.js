@@ -9,6 +9,7 @@ class commandingjs {
     private _commandsDir = 'commands'
     private _listenersDir = ''
     private _mongo = ''
+    private _syntaxError = 'Wrong Syntax!'
     private _prefixes: { [name: string] : string } = {}
     private _commandHandler: CommandHandler
 
@@ -58,6 +59,15 @@ class commandingjs {
     
     public setMongoPath(mongoPath: string): commandingjs{
         this._mongo = mongoPath
+        return this
+    }
+
+    public get syntaxError(): string{
+        return this._syntaxError
+    }
+
+    public setSyntaxError(syntaxError: string): commandingjs{
+        this._syntaxError = syntaxError
         return this
     }
 
