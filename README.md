@@ -2,9 +2,9 @@
 
 - [Installation](#installation)
 - [Setup](#setup)
+- [Changing Default Prefix](#prefixes)
 - [Creating a Command](#creating-a-command)
 - [Usage of minArgs and maxArgs](#minargs--maxargs)
-- [Changing Default Prefix](#prefixes)
 - [Sources](#sources)
 
 # Installation
@@ -40,6 +40,16 @@ client.once('ready' , () => {
 })
 
 client.login(token)
+```
+
+# Prefixes
+
+The default prefix of the bot on installing this package will be - `>` .
+You can change it in your main file using -
+
+```js
+new CommandingJS(client)
+    .setDefaultPrefix('!')
 ```
 
 # Creating a Command
@@ -86,16 +96,6 @@ module.exports = {
 ```
 
 Note - `minArgs` cannot be less than `maxArgs` or you will get an error.
-
-# Prefixes
-
-The default prefix of the bot on installing this package will be - `>` .
-You can change it in your main file using -
-
-```js
-new CommandingJS(client)
-    .setDefaultPrefix('!')
-```
 
 # SOURCES
 
