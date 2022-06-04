@@ -97,6 +97,45 @@ module.exports = {
 
 Note - `minArgs` cannot be less than `maxArgs` or you will get an error.
 
+# Syntax Error
+
+## Global Syntax Error -
+
+The default syntaxError is `Wrong Syntax` !
+You can change it in your main file using -
+
+```js
+new CommandingJS(client)
+    .setSyntaxError("")
+```
+
+## Per-Command Syntax Error -
+
+You can specify the syntax error for each command using -
+
+```js
+module.exports = {
+    name: 'ping-member' ,
+    commands: ['ping-member' , 'pingmember' , 'pm'] ,
+    description: 'Bot pings the member you ping' ,
+    syntaxError: 'wrong symtax! use {PREFIX}{COMMAND} <@mention>' ,
+    minArgs: 1 ,
+    maxArgs: 1 ,
+    callback: (message) => {
+        const { mentions } = message
+        const target = mentions.users.first()
+
+        if(target){
+            message.channel.send(`Hello , ${target} !`)
+        }
+    }
+}
+```
+
+You can use -
+`{PREFIX}` - to show the bot's perfix on the Error
+`{COMMAND}` - command name
+
 # SOURCES
 
 All these snippets have come from [Commanding.JS Test Repository](https://github.com/CodyAaTherf/commandingjs-tests). It has been maintained by me itself.
