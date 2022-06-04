@@ -19,61 +19,65 @@ class CommandHandler {
                 if(amount > 0){
                     console.log(`Loaded ${amount} command${amount === 1 ? '' : 's'}`)
 
+                    // for(const file of files){
+                    //     let fileName: string | string[] = file
+                    //         .replace(/\\/g , '/')
+                    //         .split('/')
+
+                    //     fileName = fileName[fileName.length - 1]
+                    //     fileName = fileName.split('.')[0].toLowerCase()
+
+                    //     const configuration = require(file)
+                    //     const{
+                    //         name ,
+                    //         commands ,
+                    //         aliases ,
+                    //         callback ,
+                    //         execute ,
+                    //         description ,
+                    //         minArgs ,
+                    //         maxArgs ,
+                    //     } = configuration
+
+                    //     if(callback && execute){
+                    //         throw new Error('Commands can have either "callback" or "execute".')
+                    //     }
+
+                    //     let names = commands || aliases
+
+                    //     if(!name && (!names || names.length === 0)){
+                    //         throw new Error(`Command "${file}" does not have "name" specified.`)
+                    //     }
+
+                    //     if(typeof names === 'string'){
+                    //         names = [names]
+                    //     }
+
+                    //     if(names && !names.includes(name.toLowerCase())){
+                    //         names.unshift(name.toLowerCase())
+                    //     }
+
+                    //     if(!names.includes(fileName)){
+                    //         names.unshift(fileName)
+                    //     }
+
+                    //     if(!description){
+                    //         console.warn(`Command "${names[0]}" does not have "description" property.`)
+                    //     }
+
+                    //     const hasCallback = callback || execute
+
+                    //     if(hasCallback){
+                    //         const command = new Command(instance , client , names , callback || execute , configuration)
+
+                    //         for(const name of names){
+                    //             this._commands.set(name.toLowerCase() , command)
+                    //         }
+                    //     }
+                    // }
+
                     for(const file of files){
-                        let fileName: string | string[] = file
-                            .replace(/\\/g , '/')
-                            .split('/')
-
-                        fileName = fileName[fileName.length - 1]
-                        fileName = fileName.split('.')[0].toLowerCase()
-
-                        const configuration = require(file)
-                        const{
-                            name ,
-                            commands ,
-                            aliases ,
-                            callback ,
-                            execute ,
-                            description ,
-                            minArgs ,
-                            maxArgs ,
-                        } = configuration
-
-                        if(callback && execute){
-                            throw new Error('Commands can have either "callback" or "execute".')
-                        }
-
-                        let names = commands || aliases
-
-                        if(!name && (!names || names.length === 0)){
-                            throw new Error(`Command "${file}" does not have "name" specified.`)
-                        }
-
-                        if(typeof names === 'string'){
-                            names = [names]
-                        }
-
-                        if(names && !names.includes(name.toLowerCase())){
-                            names.unshift(name.toLowerCase())
-                        }
-
-                        if(!names.includes(fileName)){
-                            names.unshift(fileName)
-                        }
-
-                        if(!description){
-                            console.warn(`Command "${names[0]}" does not have "description" property.`)
-                        }
-
-                        const hasCallback = callback || execute
-
-                        if(hasCallback){
-                            const command = new Command(instance , client , names , callback || execute , configuration)
-
-                            for(const name of names){
-                                this._commands.set(name.toLowerCase() , command)
-                            }
-                        }
+                        this.registerCommand(instance , client , file)
                     }
 
                     client.on('message' , (message) => {
@@ -131,6 +135,61 @@ class CommandHandler {
                 }
             } else{
                 throw new Error(`Commands directory "${dir} doesn't exist !`)
+            }
+        }
+    }
+
+    public registerCommand(
+        instance: commandingjs ,
+        client: Client ,
+        file: string
+    ){
+        const configuration = require(file)
+
+        const{
+            name ,
+            commands ,
+            aliases ,
+            callback ,
+            execute ,
+            descripion
+        } = configuration
+
+        if(callback && execute){
+            throw new Error('Commands can have either "callback" or "execute"')
+        }
+
+        let names = commands || aliases || []
+
+        if(!name && (!names || names.length === 0)){
+            throw new Error(`Command "${file}" does not have "name" specified.`)
+        }
+
+        if(typeof names === 'string'){
+            names = [names]
+        }
+
+        if(name && !names.includes(name.toLowerCase())){
+            names.unshift(name.toLowerCase())
+        }
+
+        if(!descripion){
+            console.warn(`Command "${names[0]}" does not have "description" property.`)
+        }
+
+        const hasCallback = callback || execute
+
+        if(hasCallback){
+            const command = new Command(
+                instance ,
+                client ,
+                names ,
+                callback || execute ,
+                configuration
+            )
+
+            for(const name of names){
+                this._commands.set(name.toLowerCase() , command)
             }
         }
     }

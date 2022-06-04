@@ -1,8 +1,12 @@
 import { Client , Guild } from 'discord.js'
+import path from 'path'
+
 import CommandHandler from './CommandHandler'
 import ListenerHandler from './ListenerHandler'
 import ICommand from './interfaces/ICommand'
 import mongo from './mongo'
+import getAllFiles from './get-all-files'
+import prefixes from './models/prefixes'
 
 class commandingjs {
     private _defaultPrefix = '>'
@@ -50,6 +54,28 @@ class commandingjs {
                 console.warn("MongoDB connection URI isn't provided , some features might not work!")
             }
         } , 500)
+
+        // Built in cmds
+
+        for(const file of getAllFiles(
+            path.join(__dirname , 'commands')
+            )){
+                this._commandHandler.registerCommand(this , client , file)
+            }
+
+        const loadPrefixes = async() => {
+            const results: any[] = await prefixes.find({})
+
+            for(const result of results){
+                const { _id , prefix } = result
+
+                this._prefixes[_id] = prefix
+            }
+
+            console.log(this._prefixes);            
+        }
+
+        loadPrefixes()
     }
 
     public get mongoPath(): string{
@@ -85,6 +111,12 @@ class commandingjs {
 
     public getPrefix(guild: Guild | null): string{
         return this._prefixes[guild ? guild.id : ''] || this._defaultPrefix
+    }
+
+    public setPrefix(guild: Guild | null , prefix: string){
+        if(guild){
+            this._prefixes[guild.id] = prefix
+        }
     }
 
     public get commands(): ICommand[]{

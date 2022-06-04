@@ -15,42 +15,53 @@ var CommandHandler = /** @class */ (function () {
                 var amount = files.length;
                 if (amount > 0) {
                     console.log("Loaded " + amount + " command" + (amount === 1 ? '' : 's'));
+                    // for(const file of files){
+                    //     let fileName: string | string[] = file
+                    //         .replace(/\\/g , '/')
+                    //         .split('/')
+                    //     fileName = fileName[fileName.length - 1]
+                    //     fileName = fileName.split('.')[0].toLowerCase()
+                    //     const configuration = require(file)
+                    //     const{
+                    //         name ,
+                    //         commands ,
+                    //         aliases ,
+                    //         callback ,
+                    //         execute ,
+                    //         description ,
+                    //         minArgs ,
+                    //         maxArgs ,
+                    //     } = configuration
+                    //     if(callback && execute){
+                    //         throw new Error('Commands can have either "callback" or "execute".')
+                    //     }
+                    //     let names = commands || aliases
+                    //     if(!name && (!names || names.length === 0)){
+                    //         throw new Error(`Command "${file}" does not have "name" specified.`)
+                    //     }
+                    //     if(typeof names === 'string'){
+                    //         names = [names]
+                    //     }
+                    //     if(names && !names.includes(name.toLowerCase())){
+                    //         names.unshift(name.toLowerCase())
+                    //     }
+                    //     if(!names.includes(fileName)){
+                    //         names.unshift(fileName)
+                    //     }
+                    //     if(!description){
+                    //         console.warn(`Command "${names[0]}" does not have "description" property.`)
+                    //     }
+                    //     const hasCallback = callback || execute
+                    //     if(hasCallback){
+                    //         const command = new Command(instance , client , names , callback || execute , configuration)
+                    //         for(const name of names){
+                    //             this._commands.set(name.toLowerCase() , command)
+                    //         }
+                    //     }
+                    // }
                     for (var _i = 0, files_1 = files; _i < files_1.length; _i++) {
                         var file = files_1[_i];
-                        var fileName = file
-                            .replace(/\\/g, '/')
-                            .split('/');
-                        fileName = fileName[fileName.length - 1];
-                        fileName = fileName.split('.')[0].toLowerCase();
-                        var configuration = require(file);
-                        var name_1 = configuration.name, commands = configuration.commands, aliases = configuration.aliases, callback = configuration.callback, execute = configuration.execute, description = configuration.description, minArgs = configuration.minArgs, maxArgs = configuration.maxArgs;
-                        if (callback && execute) {
-                            throw new Error('Commands can have either "callback" or "execute".');
-                        }
-                        var names = commands || aliases;
-                        if (!name_1 && (!names || names.length === 0)) {
-                            throw new Error("Command \"" + file + "\" does not have \"name\" specified.");
-                        }
-                        if (typeof names === 'string') {
-                            names = [names];
-                        }
-                        if (names && !names.includes(name_1.toLowerCase())) {
-                            names.unshift(name_1.toLowerCase());
-                        }
-                        if (!names.includes(fileName)) {
-                            names.unshift(fileName);
-                        }
-                        if (!description) {
-                            console.warn("Command \"" + names[0] + "\" does not have \"description\" property.");
-                        }
-                        var hasCallback = callback || execute;
-                        if (hasCallback) {
-                            var command = new Command_1.default(instance, client, names, callback || execute, configuration);
-                            for (var _a = 0, names_1 = names; _a < names_1.length; _a++) {
-                                var name_2 = names_1[_a];
-                                this._commands.set(name_2.toLowerCase(), command);
-                            }
-                        }
+                        this.registerCommand(instance, client, file);
                     }
                     client.on('message', function (message) {
                         var guild = message.guild;
@@ -61,8 +72,8 @@ var CommandHandler = /** @class */ (function () {
                             var args = content.split(/ /g);
                             var firstElement = args.shift();
                             if (firstElement) {
-                                var name_3 = firstElement.toLowerCase();
-                                var command = _this._commands.get(name_3);
+                                var name_1 = firstElement.toLowerCase();
+                                var command = _this._commands.get(name_1);
                                 if (command) {
                                     // command.execute(message , args)
                                     // const { minArgs , maxArgs } = command
@@ -81,7 +92,7 @@ var CommandHandler = /** @class */ (function () {
                                         if (syntaxError) {
                                             syntaxError = syntaxError.replace(/{PREFIX}/g, prefix);
                                         }
-                                        syntaxError = syntaxError.replace(/{COMMAND}/g, name_3);
+                                        syntaxError = syntaxError.replace(/{COMMAND}/g, name_1);
                                         syntaxError = syntaxError.replace(/ {ARGUMENTS}/g, expectedArgs ? " " + expectedArgs : '');
                                         message.reply(syntaxError);
                                         return;
@@ -98,6 +109,34 @@ var CommandHandler = /** @class */ (function () {
             }
         }
     }
+    CommandHandler.prototype.registerCommand = function (instance, client, file) {
+        var configuration = require(file);
+        var name = configuration.name, commands = configuration.commands, aliases = configuration.aliases, callback = configuration.callback, execute = configuration.execute, descripion = configuration.descripion;
+        if (callback && execute) {
+            throw new Error('Commands can have either "callback" or "execute"');
+        }
+        var names = commands || aliases || [];
+        if (!name && (!names || names.length === 0)) {
+            throw new Error("Command \"" + file + "\" does not have \"name\" specified.");
+        }
+        if (typeof names === 'string') {
+            names = [names];
+        }
+        if (name && !names.includes(name.toLowerCase())) {
+            names.unshift(name.toLowerCase());
+        }
+        if (!descripion) {
+            console.warn("Command \"" + names[0] + "\" does not have \"description\" property.");
+        }
+        var hasCallback = callback || execute;
+        if (hasCallback) {
+            var command = new Command_1.default(instance, client, names, callback || execute, configuration);
+            for (var _i = 0, names_1 = names; _i < names_1.length; _i++) {
+                var name_2 = names_1[_i];
+                this._commands.set(name_2.toLowerCase(), command);
+            }
+        }
+    };
     Object.defineProperty(CommandHandler.prototype, "commands", {
         get: function () {
             var results = new Map();
