@@ -139,6 +139,7 @@ module.exports = {
 
 You can use -
 `{PREFIX}` - to show the bot's perfix on the Error
+
 `{COMMAND}` - command name
 
 # MongoDB Connection
@@ -167,6 +168,7 @@ config.json
 # Built in commands -
 
 `>prefix` - Displays the prefix of the bot
+
 `>prefix <new prefix>` - Changes the prefix of the bot. It is supported per server. Required MongoDB Connection. See [MongoDB Connection](#mongodb-connection) to know to to connect to MongoDB.
 
 # SOURCES
