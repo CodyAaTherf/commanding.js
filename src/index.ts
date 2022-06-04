@@ -37,7 +37,6 @@ class commandingjs {
         this._commandsDir = commandsDir || this._commandsDir
         this._listenersDir = listenerDir || this._listenersDir
 
-        // new CommandHandler(this , client , this._commandsDir)
         this._commandHandler = new CommandHandler(this , client , this._commandsDir)
 
         if(this._listenersDir){

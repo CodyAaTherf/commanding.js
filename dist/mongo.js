@@ -46,8 +46,7 @@ var mongo = function (mongoPath) { return __awaiter(void 0, void 0, void 0, func
             case 0: return [4 /*yield*/, mongoose_1.default.connect(mongoPath, {
                     keepAlive: true,
                     useNewUrlParser: true,
-                    useUnifiedTopology: true,
-                    useFindAndModify: true
+                    useUnifiedTopology: true
                 })];
             case 1:
                 _a.sent();

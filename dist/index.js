@@ -31,7 +31,6 @@ var commandingjs = /** @class */ (function () {
         }
         this._commandsDir = commandsDir || this._commandsDir;
         this._listenersDir = listenerDir || this._listenersDir;
-        // new CommandHandler(this , client , this._commandsDir)
         this._commandHandler = new CommandHandler_1.default(this, client, this._commandsDir);
         if (this._listenersDir) {
             new ListenerHandler_1.default(client, this._listenersDir);
