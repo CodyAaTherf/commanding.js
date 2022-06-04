@@ -11,9 +11,6 @@ var CommandHandler = /** @class */ (function () {
         this._commands = new Map();
         if (dir) {
             if (fs_1.default.existsSync(dir)) {
-                // const files = fs
-                //     .readdirSync(dir)
-                //     .filter((file: string) => file.endsWith('.js'))
                 var files = (0, get_all_files_1.default)(dir);
                 var amount = files.length;
                 if (amount > 0) {
@@ -26,8 +23,7 @@ var CommandHandler = /** @class */ (function () {
                         fileName = fileName[fileName.length - 1];
                         fileName = fileName.split('.')[0].toLowerCase();
                         var configuration = require(file);
-                        // const { aliases , callback } = configuration
-                        var name_1 = configuration.name, commands = configuration.commands, aliases = configuration.aliases, callback = configuration.callback, execute = configuration.execute, description = configuration.description;
+                        var name_1 = configuration.name, commands = configuration.commands, aliases = configuration.aliases, callback = configuration.callback, execute = configuration.execute, description = configuration.description, minArgs = configuration.minArgs, maxArgs = configuration.maxArgs;
                         if (callback && execute) {
                             throw new Error('Commands can have either "callback" or "execute".');
                         }
@@ -41,12 +37,6 @@ var CommandHandler = /** @class */ (function () {
                         if (names && !names.includes(name_1.toLowerCase())) {
                             names.unshift(name_1.toLowerCase());
                         }
-                        // if(aliases && aliases.length && callback){
-                        //     const command = new Command(instance , client , configuration)
-                        //     for(const alias of aliases){
-                        //         this._commands.set(alias.toLowerCase() , command)
-                        //     }
-                        // }
                         if (!names.includes(fileName)) {
                             names.unshift(fileName);
                         }
@@ -68,13 +58,23 @@ var CommandHandler = /** @class */ (function () {
                         var prefix = instance.getPrefix(guild);
                         if (content.startsWith(prefix)) {
                             content = content.substring(prefix.length);
-                            var words = content.split(/ /g);
-                            var firstElement = words.shift();
+                            var args = content.split(/ /g);
+                            var firstElement = args.shift();
                             if (firstElement) {
-                                var alias = firstElement.toLowerCase();
-                                var command = _this._commands.get(alias);
+                                var name_3 = firstElement.toLowerCase();
+                                var command = _this._commands.get(name_3);
                                 if (command) {
-                                    command.execute(message, words);
+                                    // command.execute(message , args)
+                                    var minArgs = command.minArgs, maxArgs = command.maxArgs;
+                                    if (minArgs !== undefined && args.length < minArgs) {
+                                        message.reply('Not enough Args specified');
+                                        return;
+                                    }
+                                    if (maxArgs !== undefined && maxArgs !== -1 && args.length > maxArgs) {
+                                        message.reply('Too many Args specified.');
+                                        return;
+                                    }
+                                    command.execute(message, args);
                                 }
                             }
                         }
