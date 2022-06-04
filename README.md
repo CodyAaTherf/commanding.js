@@ -5,6 +5,11 @@
 - [Changing Default Prefix](#prefixes)
 - [Creating a Command](#creating-a-command)
 - [Usage of minArgs and maxArgs](#minargs--maxargs)
+- [Syntax Errors](#syntax-error)
+    - [Global Syntax Errors](#global-syntax-error)
+    - [Per Command Syntax Error](#per-command-syntax-error)
+- [MongoDB Connection](#mongodb-connection)
+- [Built in Commands](#built-in-commands)
 - [Sources](#sources)
 
 # Installation
