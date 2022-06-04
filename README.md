@@ -136,6 +136,34 @@ You can use -
 `{PREFIX}` - to show the bot's perfix on the Error
 `{COMMAND}` - command name
 
+# MongoDB Connection
+
+MongoDB Connection is optional. You will need it to use the built in commands or any commands that you use that requires to save data.
+You can define it in the main file using -
+
+```js
+// index file
+
+const config = require('./config.json')
+
+new CommandingJS(client)
+    .setMongoPath(config.mongo_uri)
+```
+
+config.json
+
+```json
+{
+    "token": "" ,
+    "mongo_uri": ""
+}
+```
+
+# Built in commands -
+
+`>prefix` - Displays the prefix of the bot
+`>prefix <new prefix>` - Changes the prefix of the bot. It is supported per server. Required MongoDB Connection. See [MongoDB Connection](#mongodb-connection) to know to to connect to MongoDB.
+
 # SOURCES
 
 All these snippets have come from [Commanding.JS Test Repository](https://github.com/CodyAaTherf/commandingjs-tests). It has been maintained by me itself.
