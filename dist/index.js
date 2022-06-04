@@ -154,6 +154,13 @@ var commandingjs = /** @class */ (function () {
             this._prefixes[guild.id] = prefix;
         }
     };
+    Object.defineProperty(commandingjs.prototype, "commandHandler", {
+        get: function () {
+            return this._commandHandler;
+        },
+        enumerable: false,
+        configurable: true
+    });
     Object.defineProperty(commandingjs.prototype, "commands", {
         get: function () {
             return this._commandHandler.commands;

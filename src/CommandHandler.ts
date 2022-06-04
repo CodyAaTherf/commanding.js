@@ -1,14 +1,15 @@
 import { Client , Guild } from 'discord.js'
 import commandingjs from '.'
+import fs from 'fs'
 
 import Command from './Command'
 import getAllFiles from './get-all-files'
-
-import fs from 'fs'
 import ICommand from './interfaces/ICommand'
+import disabledCommands from './models/disabled-commands'
 
 class CommandHandler {
     private _commands: Map<String , Command> = new Map()
+    private _disabled: Map<String , String[]> = new Map()
 
     constructor(instance: commandingjs , client: Client , dir: string){
         if(dir){
@@ -17,64 +18,9 @@ class CommandHandler {
                 const amount = files.length
 
                 if(amount > 0){
+                    this.fetchDisabledCommands()
+
                     console.log(`Loaded ${amount} command${amount === 1 ? '' : 's'}`)
-
-                    // for(const file of files){
-                    //     let fileName: string | string[] = file
-                    //         .replace(/\\/g , '/')
-                    //         .split('/')
-
-                    //     fileName = fileName[fileName.length - 1]
-                    //     fileName = fileName.split('.')[0].toLowerCase()
-
-                    //     const configuration = require(file)
-                    //     const{
-                    //         name ,
-                    //         commands ,
-                    //         aliases ,
-                    //         callback ,
-                    //         execute ,
-                    //         description ,
-                    //         minArgs ,
-                    //         maxArgs ,
-                    //     } = configuration
-
-                    //     if(callback && execute){
-                    //         throw new Error('Commands can have either "callback" or "execute".')
-                    //     }
-
-                    //     let names = commands || aliases
-
-                    //     if(!name && (!names || names.length === 0)){
-                    //         throw new Error(`Command "${file}" does not have "name" specified.`)
-                    //     }
-
-                    //     if(typeof names === 'string'){
-                    //         names = [names]
-                    //     }
-
-                    //     if(names && !names.includes(name.toLowerCase())){
-                    //         names.unshift(name.toLowerCase())
-                    //     }
-
-                    //     if(!names.includes(fileName)){
-                    //         names.unshift(fileName)
-                    //     }
-
-                    //     if(!description){
-                    //         console.warn(`Command "${names[0]}" does not have "description" property.`)
-                    //     }
-
-                    //     const hasCallback = callback || execute
-
-                    //     if(hasCallback){
-                    //         const command = new Command(instance , client , names , callback || execute , configuration)
-
-                    //         for(const name of names){
-                    //             this._commands.set(name.toLowerCase() , command)
-                    //         }
-                    //     }
-                    // }
 
                     for(const file of files){
                         this.registerCommand(instance , client , file)
@@ -96,21 +42,18 @@ class CommandHandler {
                                 const command = this._commands.get(name)
 
                                 if(command){
-                                    // command.execute(message , args)
-                                    // const { minArgs , maxArgs } = command
+                                    if(guild){
+                                        const isDisabled = instance.commandHandler.isCommandDisabled(guild.id , command.names[0])
 
-                                    // if(minArgs !== undefined && args.length < minArgs){
-                                    //     message.reply('Not enough Args specified')
-                                    //     return
-                                    // }
+                                        if(isDisabled){
+                                            message.reply("This command is currectly disabled in this server!")
+
+                                            return
+                                        }
+                                    }
 
                                     const { minArgs , maxArgs , expectedArgs } = command
                                     let { syntaxError = instance.syntaxError } = command
-
-                                    // if(maxArgs !== undefined && maxArgs !== -1 && args.length > maxArgs){
-                                    //     message.reply('Too many Args specified.')
-                                    //     return
-                                    // }
 
                                     if(
                                         (minArgs !== undefined && args.length < minArgs) ||
@@ -195,16 +138,56 @@ class CommandHandler {
     }
 
     public get commands(): ICommand[]{
-        const results = new Map()
+        const results: { names: string[] ; description: string }[] = []
 
         this._commands.forEach(({ names , description = '' }) => {
-            results.set(names[0] , {
-                names ,
+            results.push({
+                names: [...names] ,
                 description
             })
         })
 
-        return Array.from(results.values())
+        // return Array.from(results.values())
+        return results
+    }
+
+    public async fetchDisabledCommands(){
+        const results: any[] = await disabledCommands.find({})
+
+        for(const result of results){
+            const { guildId , command } = result
+
+            const array = this._disabled.get(guildId) || []
+            array.push(command)
+
+            this._disabled.set(guildId , array)
+        }
+
+        console.log(this._disabled);        
+    }
+
+    public disableCommand(guildId: string , command: string){
+        const array = this._disabled.get(guildId) || []
+
+        if(array && !array.includes(command)){
+            array.push(command)
+            this._disabled.set(guildId , array)
+        }
+    }
+
+    public enableCommand(guildId: string , command: string){
+        const array = this._disabled.get(guildId) || []
+        const index = array ? array.indexOf(command) : -1
+
+        if(array && index >= 0){
+            array.splice(index , 1)
+        }
+    }
+
+    public isCommandDisabled(guildId: string , command: string): boolean{
+        const array = this._disabled.get(guildId)
+        
+        return(array && array.includes(command)) || false
     }
 }
 
