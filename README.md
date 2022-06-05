@@ -8,6 +8,7 @@
 - [Syntax Errors](#syntax-error)
     - [Global Syntax Errors](#global-syntax-error)
     - [Per Command Syntax Error](#per-command-syntax-error)
+- [Permissions](#permissions)
 - [MongoDB Connection](#mongodb-connection)
 - [Built in Commands](#built-in-commands)
 - [Sources](#sources)
@@ -141,6 +142,24 @@ You can use -
 `{PREFIX}` - to show the bot's perfix on the Error
 
 `{COMMAND}` - command name
+
+# Permissions
+
+Making a ban command or any other command that requires permissions? You can do it by -
+
+```js
+module.exports = {
+    name: 'ping' ,
+    commands: ['p'] , // or aliases: ['p'] . either works
+    description: 'Ping' ,
+    requiredPermissions: ['ADMINISTRATOR'] ,
+    callback: (message) => {
+      message.reply('Pong!')
+    }
+}
+```
+
+[Here](./src/permissions.ts) are all the permissions that you might have to use.
 
 # MongoDB Connection
 
