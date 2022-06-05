@@ -2,14 +2,10 @@ import { Client } from 'discord.js'
 import getAllFiles from './get-all-files'
 import fs from 'fs'
 
-class ListenerHandler{
+class FeatureHandler{
     constructor(client: Client , dir: string){
         if(dir){
             if(fs.existsSync(dir)){
-                // const files = fs
-                //     .readdirSync(dir)
-                //     .filter((file: string) => file.endsWith('.js'))
-
                 const files = getAllFiles(dir)
                 const amount = files.length
 
@@ -31,4 +27,4 @@ class ListenerHandler{
     }
 }
 
-export = ListenerHandler
+export = FeatureHandler

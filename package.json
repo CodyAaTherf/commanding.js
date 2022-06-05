@@ -1,6 +1,6 @@
 {
   "name": "commanding.js",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "A Discord.JS Command Handler to handle commands eaiser",
   "main": "dist/index.js",
   "scripts": {
@@ -25,6 +25,10 @@
   },
   "homepage": "https://github.com/CodyAaTherf/commanding.js#readme",
   "dependencies": {
-    "discord.js": "^13.7.0"
+    "discord.js": "^13.7.0",
+    "mongoose": "^6.3.5"
+  },
+  "devDependencies": {
+    "@types/mongoose": "^5.11.97"
   }
 }

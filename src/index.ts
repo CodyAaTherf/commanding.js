@@ -1,17 +1,25 @@
 import { Client , Guild } from 'discord.js'
+import path from 'path'
+import { Connection } from 'mongoose'
+
 import CommandHandler from './CommandHandler'
-import ListenerHandler from './ListenerHandler'
+import FeatureHandler from './FeatureHandler'
 import ICommand from './interfaces/ICommand'
+import mongo , { getMongoConnection }from './mongo'
+import getAllFiles from './get-all-files'
+import prefixes from './models/prefixes'
 
 class commandingjs {
     private _defaultPrefix = '>'
     private _commandsDir = 'commands'
-    private _listenersDir = ''
+    private _featuresDir = ''
     private _mongo = ''
+    private _mongoConnection: Connection | null = null
+    private _syntaxError = 'Wrong Syntax!'
     private _prefixes: { [name: string] : string } = {}
     private _commandHandler: CommandHandler
 
-    constructor(client: Client , commandsDir?: string , listenerDir?: string){
+    constructor(client: Client , commandsDir?: string , featureDir?: string){
         if(!client){
             throw new Error("Discord.jS Client isn't defined.")
         }
@@ -26,21 +34,52 @@ class commandingjs {
             if(path){
                 commandsDir = `${path}/${commandsDir || this._commandsDir}`
 
-                if(listenerDir){
-                    listenerDir = `${path}/${listenerDir}`
+                if(featureDir){
+                    featureDir = `${path}/${featureDir}`
                 }
             }
         }
 
         this._commandsDir = commandsDir || this._commandsDir
-        this._listenersDir = listenerDir || this._listenersDir
+        this._featuresDir = featureDir || this._featuresDir
 
-        // new CommandHandler(this , client , this._commandsDir)
         this._commandHandler = new CommandHandler(this , client , this._commandsDir)
 
-        if(this._listenersDir){
-            new ListenerHandler(client , this._listenersDir)
+        if(this._featuresDir){
+            new FeatureHandler(client , this._featuresDir)
         }
+
+        setTimeout(async() => {
+            if(this._mongo){
+                await mongo(this._mongo)
+
+                this._mongoConnection = getMongoConnection()
+            } else{
+                console.warn("MongoDB connection URI isn't provided , some features might not work!")
+            }
+        } , 500)
+
+        // Built in cmds
+
+        for(const file of getAllFiles(
+            path.join(__dirname , 'commands')
+            )){
+                this._commandHandler.registerCommand(this , client , file)
+            }
+
+        const loadPrefixes = async() => {
+            const results: any[] = await prefixes.find({})
+
+            for(const result of results){
+                const { _id , prefix } = result
+
+                this._prefixes[_id] = prefix
+            }
+
+            console.log(this._prefixes);            
+        }
+
+        loadPrefixes()
     }
 
     public get mongoPath(): string{
@@ -49,6 +88,15 @@ class commandingjs {
     
     public setMongoPath(mongoPath: string): commandingjs{
         this._mongo = mongoPath
+        return this
+    }
+
+    public get syntaxError(): string{
+        return this._syntaxError
+    }
+
+    public setSyntaxError(syntaxError: string): commandingjs{
+        this._syntaxError = syntaxError
         return this
     }
 
@@ -69,12 +117,26 @@ class commandingjs {
         return this._prefixes[guild ? guild.id : ''] || this._defaultPrefix
     }
 
+    public setPrefix(guild: Guild | null , prefix: string){
+        if(guild){
+            this._prefixes[guild.id] = prefix
+        }
+    }
+
+    public get commandHandler(): CommandHandler{
+        return this._commandHandler
+    }
+
     public get commands(): ICommand[]{
         return this._commandHandler.commands
     }
 
     public get commandAmount(): number{
         return this.commands.length
+    }
+
+    public get mongoConnection(): Connection | null{
+        return this._mongoConnection
     }
 }
 

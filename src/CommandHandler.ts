@@ -1,14 +1,16 @@
 import { Client , Guild } from 'discord.js'
 import commandingjs from '.'
+import fs from 'fs'
 
 import Command from './Command'
 import getAllFiles from './get-all-files'
-
-import fs from 'fs'
 import ICommand from './interfaces/ICommand'
+import disabledCommands from './models/disabled-commands'
+import permissions from './permissions'
 
 class CommandHandler {
     private _commands: Map<String , Command> = new Map()
+    private _disabled: Map<String , String[]> = new Map()
 
     constructor(instance: commandingjs , client: Client , dir: string){
         if(dir){
@@ -17,63 +19,12 @@ class CommandHandler {
                 const amount = files.length
 
                 if(amount > 0){
+                    this.fetchDisabledCommands()
+
                     console.log(`Loaded ${amount} command${amount === 1 ? '' : 's'}`)
 
                     for(const file of files){
-                        let fileName: string | string[] = file
-                            .replace(/\\/g , '/')
-                            .split('/')
-
-                        fileName = fileName[fileName.length - 1]
-                        fileName = fileName.split('.')[0].toLowerCase()
-
-                        const configuration = require(file)
-                        const{
-                            name ,
-                            commands ,
-                            aliases ,
-                            callback ,
-                            execute ,
-                            description ,
-                            minArgs ,
-                            maxArgs ,
-                        } = configuration
-
-                        if(callback && execute){
-                            throw new Error('Commands can have either "callback" or "execute".')
-                        }
-
-                        let names = commands || aliases
-
-                        if(!name && (!names || names.length === 0)){
-                            throw new Error(`Command "${file}" does not have "name" specified.`)
-                        }
-
-                        if(typeof names === 'string'){
-                            names = [names]
-                        }
-
-                        if(names && !names.includes(name.toLowerCase())){
-                            names.unshift(name.toLowerCase())
-                        }
-
-                        if(!names.includes(fileName)){
-                            names.unshift(fileName)
-                        }
-
-                        if(!description){
-                            console.warn(`Command "${names[0]}" does not have "description" property.`)
-                        }
-
-                        const hasCallback = callback || execute
-
-                        if(hasCallback){
-                            const command = new Command(instance , client , names , callback || execute , configuration)
-
-                            for(const name of names){
-                                this._commands.set(name.toLowerCase() , command)
-                            }
-                        }
+                        this.registerCommand(instance , client , file)
                     }
 
                     client.on('message' , (message) => {
@@ -92,16 +43,44 @@ class CommandHandler {
                                 const command = this._commands.get(name)
 
                                 if(command){
-                                    // command.execute(message , args)
-                                    const { minArgs , maxArgs } = command
+                                    if(guild){
+                                        const isDisabled = instance.commandHandler.isCommandDisabled(guild.id , command.names[0])
+                                        // const isDisabled = instance.commandHandler.isCommandDisabled(guild.id , command.names)
 
-                                    if(minArgs !== undefined && args.length < minArgs){
-                                        message.reply('Not enough Args specified')
-                                        return
+                                        if(isDisabled){
+                                            message.reply("This command is currectly disabled in this server!")
+
+                                            return
+                                        }
                                     }
 
-                                    if(maxArgs !== undefined && maxArgs !== -1 && args.length > maxArgs){
-                                        message.reply('Too many Args specified.')
+                                    // const { minArgs , maxArgs , expectedArgs } = command
+                                    const { member } = message
+                                    const { minArgs , maxArgs , expectedArgs , requiredPermissions = [] } = command                                  
+
+                                    let { syntaxError = instance.syntaxError } = command
+
+                                    for(const perm of requiredPermissions){
+                                        // @ts-ignore
+                                        if(!member?.permissions.any(perm)){
+                                            message.reply(`You must have "${perm}" to use this command.`)
+
+                                            return
+                                        }
+                                    }
+
+                                    if(
+                                        (minArgs !== undefined && args.length < minArgs) ||
+                                        (maxArgs !== undefined && maxArgs !== -1 && args.length > maxArgs)
+                                    ){
+                                        if(syntaxError){
+                                            syntaxError = syntaxError.replace(/{PREFIX}/g , prefix)
+                                        }
+
+                                        syntaxError = syntaxError.replace(/{COMMAND}/g , name)
+                                        syntaxError = syntaxError.replace(/ {ARGUMENTS}/g , expectedArgs ? ` ${expectedArgs}` : '')
+
+                                        message.reply(syntaxError)
                                         return
                                     }
 
@@ -117,17 +96,127 @@ class CommandHandler {
         }
     }
 
+    public registerCommand(
+        instance: commandingjs ,
+        client: Client ,
+        file: string
+    ){
+        const configuration = require(file)
+
+        const{
+            name ,
+            commands ,
+            aliases ,
+            callback ,
+            execute ,
+            run ,
+            description ,
+            requiredPermissions
+        } = configuration
+
+        let callBackCounter = 0
+        if(callback) ++callBackCounter
+        if(execute) ++callBackCounter
+        if(run) ++callBackCounter
+
+        if(callBackCounter > 1){
+            throw new Error(`Commands can have either "callback" , "execute" or "run".`)
+        }
+
+        let names = commands || aliases || []
+
+        if(!name && (!names || names.length === 0)){
+            throw new Error(`Command "${file}" does not have "name" specified.`)
+        }
+
+        if(typeof names === 'string'){
+            names = [names]
+        }
+
+        if(name && !names.includes(name.toLowerCase())){
+            names.unshift(name.toLowerCase())
+        }
+
+        if(!description){
+            console.warn(`Command "${names[0]}" does not have "description" property.`)
+        }
+
+        if(requiredPermissions){
+            for(const perm of requiredPermissions){
+                if(!permissions.includes(perm)){
+                    throw new Error(`File "${file}" has an invalid permission , "${perm}"`)
+                }
+            }
+        }
+
+        const hasCallback = callback || execute || run
+
+        if(hasCallback){
+            const command = new Command(
+                instance ,
+                client ,
+                names ,
+                callback || execute ,
+                configuration
+            )
+
+            for(const name of names){
+                this._commands.set(name.toLowerCase() , command)
+            }
+        }
+    }
+
     public get commands(): ICommand[]{
-        const results = new Map()
+        const results: { names: string[] ; description: string }[] = []
 
         this._commands.forEach(({ names , description = '' }) => {
-            results.set(names[0] , {
-                names ,
+            results.push({
+                names: [...names] ,
                 description
             })
         })
 
-        return Array.from(results.values())
+        // return Array.from(results.values())
+        return results
+    }
+
+    public async fetchDisabledCommands(){
+        const results: any[] = await disabledCommands.find({})
+
+        for(const result of results){
+            const { guildId , command } = result
+
+            const array = this._disabled.get(guildId) || []
+            array.push(command)
+
+            this._disabled.set(guildId , array)
+        }
+
+        console.log(this._disabled);        
+    }
+
+    public disableCommand(guildId: string , command: string){
+        const array = this._disabled.get(guildId) || []
+
+        if(array && !array.includes(command)){
+            array.push(command)
+            this._disabled.set(guildId , array)
+        }
+    }
+
+    public enableCommand(guildId: string , command: string){
+        const array = this._disabled.get(guildId) || []
+        const index = array ? array.indexOf(command) : -1
+
+        if(array && index >= 0){
+            array.splice(index , 1)
+        }
+    }
+
+    public isCommandDisabled(guildId: string , command: string): boolean{
+        const array = this._disabled.get(guildId)
+        
+        return(array && array.includes(command)) || false
     }
 }
 

@@ -5,6 +5,12 @@
 - [Changing Default Prefix](#prefixes)
 - [Creating a Command](#creating-a-command)
 - [Usage of minArgs and maxArgs](#minargs--maxargs)
+- [Syntax Errors](#syntax-error)
+    - [Global Syntax Errors](#global-syntax-error)
+    - [Per Command Syntax Error](#per-command-syntax-error)
+- [Permissions](#permissions)
+- [MongoDB Connection](#mongodb-connection)
+- [Built in Commands](#built-in-commands)
 - [Sources](#sources)
 
 # Installation
@@ -96,6 +102,97 @@ module.exports = {
 ```
 
 Note - `minArgs` cannot be less than `maxArgs` or you will get an error.
+
+# Syntax Error
+
+## Global Syntax Error -
+
+The default syntaxError is `Wrong Syntax` !
+You can change it in your main file using -
+
+```js
+new CommandingJS(client)
+    .setSyntaxError("")
+```
+
+## Per-Command Syntax Error -
+
+You can specify the syntax error for each command using -
+
+```js
+module.exports = {
+    name: 'ping-member' ,
+    commands: ['ping-member' , 'pingmember' , 'pm'] ,
+    description: 'Bot pings the member you ping' ,
+    syntaxError: 'wrong symtax! use {PREFIX}{COMMAND} <@mention>' ,
+    minArgs: 1 ,
+    maxArgs: 1 ,
+    callback: (message) => {
+        const { mentions } = message
+        const target = mentions.users.first()
+
+        if(target){
+            message.channel.send(`Hello , ${target} !`)
+        }
+    }
+}
+```
+
+You can use -
+`{PREFIX}` - to show the bot's perfix on the Error
+
+`{COMMAND}` - command name
+
+# Permissions
+
+Making a ban command or any other command that requires permissions? You can do it by -
+
+```js
+module.exports = {
+    name: 'ping' ,
+    commands: ['p'] , // or aliases: ['p'] . either works
+    description: 'Ping' ,
+    requiredPermissions: ['ADMINISTRATOR'] ,
+    callback: (message) => {
+      message.reply('Pong!')
+    }
+}
+```
+
+[Here](./src/permissions.ts) are all the permissions that you might have to use.
+
+# MongoDB Connection
+
+MongoDB Connection is optional. You will need it to use the built in commands or any commands that you use that requires to save data.
+You can define it in the main file using -
+
+```js
+// index file
+
+const config = require('./config.json')
+
+new CommandingJS(client)
+    .setMongoPath(config.mongo_uri)
+```
+
+config.json
+
+```json
+{
+    "token": "" ,
+    "mongo_uri": ""
+}
+```
+
+# Built in commands -
+
+`>prefix` - Displays the prefix of the bot
+
+`>prefix <new prefix>` - Changes the prefix of the bot. It is supported per server. Required MongoDB Connection. See [MongoDB Connection](#mongodb-connection) to know to to connect to MongoDB.
+
+`>command <enable | disable> <command name>` - Enable or Disable any command. It is supported per server. Requires MongoDB Connection. 
+
+`>commands` - Displays **all** the current commands of the bot.
 
 # SOURCES
 

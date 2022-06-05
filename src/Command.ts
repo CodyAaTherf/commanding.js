@@ -4,9 +4,11 @@ import commandingjs from '.'
 interface configuration{
     names: string[] | string
     minArgs?: number
-    maxArgs: number
+    maxArgs?: number
+    syntaxError?: string
     expectedArgs?: string
     description?: string
+    requiredPermissions?: string
     callback: Function
 }
 
@@ -16,9 +18,10 @@ class Command {
     private _names: string[] = []
     private _minArgs: number = 0
     private _maxArgs: number = -1
+    private _syntaxError?: string
     private _expectedArgs?: string
     private _description?: string
-    private _cooldown: string[] = []
+    private _requiredPermissions?: string
     private _callback: Function = () => {}
 
     constructor(
@@ -26,15 +29,17 @@ class Command {
         client: Client ,
         names: string[] ,
         callback: Function ,
-        { minArgs , maxArgs , expectedArgs , description }: configuration
+        { minArgs , maxArgs , syntaxError , expectedArgs , description , requiredPermissions }: configuration
     ){
         this.instance = instance
         this.client = client
         this._names = typeof names === 'string' ? [names] : names
         this._minArgs = minArgs || 0
         this._maxArgs = maxArgs === undefined ? -1 : maxArgs
+        this._syntaxError = syntaxError
         this._expectedArgs = expectedArgs
         this._description = description
+        this._requiredPermissions = requiredPermissions
         this._callback = callback
 
         if(this._minArgs < 0){
@@ -56,14 +61,13 @@ class Command {
             args ,
             args.join(' ') ,
             this.client ,
-            message.guild
-                ? this.instance.prefixes[message.guild.id]
-                : this.instance.defaultPrefix
+            this.instance.getPrefix(message.guild) ,
+            this.instance
         )
     }
     
     public get names(): string[] {
-        return this.names
+        return this._names
     }
 
     public get minArgs(): number {
@@ -74,6 +78,10 @@ class Command {
         return this._maxArgs
     }
 
+    public get syntaxError(): string | undefined{
+        return this._syntaxError
+    }
+
     public get expectedArgs(): string | undefined {
         return this._expectedArgs
     }
@@ -82,20 +90,24 @@ class Command {
         return this._description
     }
 
-    public setCooldown(member: GuildMember | string , seconds: number){
-        if(typeof member !== 'string'){
-            member = member.id
-        }
+    // public setCooldown(member: GuildMember | string , seconds: number){
+    //     if(typeof member !== 'string'){
+    //         member = member.id
+    //     }
 
-        console.log(`Setting Cooldown of ${member} for ${seconds}s`)
-    }
+    //     console.log(`Setting Cooldown of ${member} for ${seconds}s`)
+    // }
 
-    public clearCooldown(member: GuildMember | string){
-        if(typeof member !== 'string'){
-            member = member.id
-        }
+    // public clearCooldown(member: GuildMember | string){
+    //     if(typeof member !== 'string'){
+    //         member = member.id
+    //     }
 
-        console.log(`Clearning Cooldown of ${member}`)
+    //     console.log(`Clearning Cooldown of ${member}`)
+    // }
+
+    public get requiredPermissions(): string | undefined{
+        return this._requiredPermissions
     }
 
     public get callback(): Function{
