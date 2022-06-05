@@ -3,9 +3,10 @@ import commandingjs from '..'
 
 export = {
     name: 'commands' ,
-    aliases: 'cmds' ,
+    aliases: ['cmds'] ,
     minArgs: 0 ,
     maxArgs: 0 ,
+    description: 'Displays all the commands of the bot.' ,
     callback: (
         message: Message ,
         args: string[] ,

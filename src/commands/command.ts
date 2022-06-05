@@ -8,6 +8,7 @@ export = {
     minArgs: 2 ,
     maxArgs: 2 ,
     expectedArgs: '<enable | disable> <Command Name>' ,
+    description: 'Enable or Disable any command.' ,
     callback: async(
         message: Message ,
         args: string[] ,
@@ -28,7 +29,7 @@ export = {
         const { guild } = message
 
         if(!guild){
-            message.reply("You cannot enable or disab;e commands in DMs.")
+            message.reply("You cannot enable or disable commands in DMs.")
 
             return
         }

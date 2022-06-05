@@ -45,6 +45,7 @@ module.exports = {
     minArgs: 0,
     maxArgs: 1,
     expectedArgs: '(New Prefix)',
+    description: 'Shows current prefix of the bot / Changes prefix.',
     callback: function (message, args, text, client, prefix, instance) { return __awaiter(void 0, void 0, void 0, function () {
         var guild, id;
         return __generator(this, function (_a) {

@@ -171,6 +171,10 @@ config.json
 
 `>prefix <new prefix>` - Changes the prefix of the bot. It is supported per server. Required MongoDB Connection. See [MongoDB Connection](#mongodb-connection) to know to to connect to MongoDB.
 
+`>command <enable | disable> <command name>` - Enable or Disable any command. It is supported per server. Requires MongoDB Connection. 
+
+`>commands` - Displays **all** the current commands of the bot.
+
 # SOURCES
 
 All these snippets have come from [Commanding.JS Test Repository](https://github.com/CodyAaTherf/commandingjs-tests). It has been maintained by me itself.

@@ -8,6 +8,7 @@ export = {
     minArgs: 0 ,
     maxArgs: 1 ,
     expectedArgs: '(New Prefix)' ,
+    description: 'Shows current prefix of the bot / Changes prefix.' ,
     callback: async(
         message: Message ,
         args: string[] ,

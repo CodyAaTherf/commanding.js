@@ -45,6 +45,7 @@ module.exports = {
     minArgs: 2,
     maxArgs: 2,
     expectedArgs: '<enable | disable> <Command Name>',
+    description: 'Enable or Disable any command.',
     callback: function (message, args, text, client, prefix, instance) { return __awaiter(void 0, void 0, void 0, function () {
         var newState, name, guild, _i, _a, names, mainCommand, isDisabled;
         var _b, _c;
@@ -59,7 +60,7 @@ module.exports = {
                     }
                     guild = message.guild;
                     if (!guild) {
-                        message.reply("You cannot enable or disab;e commands in DMs.");
+                        message.reply("You cannot enable or disable commands in DMs.");
                         return [2 /*return*/];
                     }
                     _i = 0, _a = instance.commands;
