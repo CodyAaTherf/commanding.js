@@ -1,6 +1,6 @@
 {
   "name": "commanding.js",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "A Discord.JS Command Handler to handle commands eaiser",
   "main": "dist/index.js",
   "scripts": {
