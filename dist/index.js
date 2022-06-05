@@ -1,4 +1,23 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -41,7 +60,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 var path_1 = __importDefault(require("path"));
 var CommandHandler_1 = __importDefault(require("./CommandHandler"));
 var FeatureHandler_1 = __importDefault(require("./FeatureHandler"));
-var mongo_1 = __importDefault(require("./mongo"));
+var mongo_1 = __importStar(require("./mongo"));
 var get_all_files_1 = __importDefault(require("./get-all-files"));
 var prefixes_1 = __importDefault(require("./models/prefixes"));
 var commandingjs = /** @class */ (function () {
@@ -51,6 +70,7 @@ var commandingjs = /** @class */ (function () {
         this._commandsDir = 'commands';
         this._featuresDir = '';
         this._mongo = '';
+        this._mongoConnection = null;
         this._syntaxError = 'Wrong Syntax!';
         this._prefixes = {};
         if (!client) {
@@ -74,14 +94,23 @@ var commandingjs = /** @class */ (function () {
         if (this._featuresDir) {
             new FeatureHandler_1.default(client, this._featuresDir);
         }
-        setTimeout(function () {
-            if (_this._mongo) {
-                (0, mongo_1.default)(_this._mongo);
-            }
-            else {
-                console.warn("MongoDB connection URI isn't provided , some features might not work!");
-            }
-        }, 500);
+        setTimeout(function () { return __awaiter(_this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (!this._mongo) return [3 /*break*/, 2];
+                        return [4 /*yield*/, (0, mongo_1.default)(this._mongo)];
+                    case 1:
+                        _a.sent();
+                        this._mongoConnection = (0, mongo_1.getMongoConnection)();
+                        return [3 /*break*/, 3];
+                    case 2:
+                        console.warn("MongoDB connection URI isn't provided , some features might not work!");
+                        _a.label = 3;
+                    case 3: return [2 /*return*/];
+                }
+            });
+        }); }, 500);
         // Built in cmds
         for (var _i = 0, _a = (0, get_all_files_1.default)(path_1.default.join(__dirname, 'commands')); _i < _a.length; _i++) {
             var file = _a[_i];
@@ -171,6 +200,13 @@ var commandingjs = /** @class */ (function () {
     Object.defineProperty(commandingjs.prototype, "commandAmount", {
         get: function () {
             return this.commands.length;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(commandingjs.prototype, "mongoConnection", {
+        get: function () {
+            return this._mongoConnection;
         },
         enumerable: false,
         configurable: true

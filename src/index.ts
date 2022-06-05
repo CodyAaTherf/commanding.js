@@ -1,10 +1,11 @@
 import { Client , Guild } from 'discord.js'
 import path from 'path'
+import { Connection } from 'mongoose'
 
 import CommandHandler from './CommandHandler'
 import FeatureHandler from './FeatureHandler'
 import ICommand from './interfaces/ICommand'
-import mongo from './mongo'
+import mongo , { getMongoConnection }from './mongo'
 import getAllFiles from './get-all-files'
 import prefixes from './models/prefixes'
 
@@ -13,6 +14,7 @@ class commandingjs {
     private _commandsDir = 'commands'
     private _featuresDir = ''
     private _mongo = ''
+    private _mongoConnection: Connection | null = null
     private _syntaxError = 'Wrong Syntax!'
     private _prefixes: { [name: string] : string } = {}
     private _commandHandler: CommandHandler
@@ -47,9 +49,11 @@ class commandingjs {
             new FeatureHandler(client , this._featuresDir)
         }
 
-        setTimeout(() => {
+        setTimeout(async() => {
             if(this._mongo){
-                mongo(this._mongo)
+                await mongo(this._mongo)
+
+                this._mongoConnection = getMongoConnection()
             } else{
                 console.warn("MongoDB connection URI isn't provided , some features might not work!")
             }
@@ -129,6 +133,10 @@ class commandingjs {
 
     public get commandAmount(): number{
         return this.commands.length
+    }
+
+    public get mongoConnection(): Connection | null{
+        return this._mongoConnection
     }
 }
 
