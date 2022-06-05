@@ -10,4 +10,4 @@ const disabledCommands = new mongoose.Schema({
     command: requiredStr
 })
 
-export = mongoose.model('commandingjs-disable-commands' , disabledCommands)
+export = mongoose.model('commandingjs-disabled-commands' , disabledCommands)

@@ -2,7 +2,7 @@ import { Client , Guild } from 'discord.js'
 import path from 'path'
 
 import CommandHandler from './CommandHandler'
-import ListenerHandler from './ListenerHandler'
+import FeatureHandler from './FeatureHandler'
 import ICommand from './interfaces/ICommand'
 import mongo from './mongo'
 import getAllFiles from './get-all-files'
@@ -11,13 +11,13 @@ import prefixes from './models/prefixes'
 class commandingjs {
     private _defaultPrefix = '>'
     private _commandsDir = 'commands'
-    private _listenersDir = ''
+    private _featuresDir = ''
     private _mongo = ''
     private _syntaxError = 'Wrong Syntax!'
     private _prefixes: { [name: string] : string } = {}
     private _commandHandler: CommandHandler
 
-    constructor(client: Client , commandsDir?: string , listenerDir?: string){
+    constructor(client: Client , commandsDir?: string , featureDir?: string){
         if(!client){
             throw new Error("Discord.jS Client isn't defined.")
         }
@@ -32,19 +32,19 @@ class commandingjs {
             if(path){
                 commandsDir = `${path}/${commandsDir || this._commandsDir}`
 
-                if(listenerDir){
-                    listenerDir = `${path}/${listenerDir}`
+                if(featureDir){
+                    featureDir = `${path}/${featureDir}`
                 }
             }
         }
 
         this._commandsDir = commandsDir || this._commandsDir
-        this._listenersDir = listenerDir || this._listenersDir
+        this._featuresDir = featureDir || this._featuresDir
 
         this._commandHandler = new CommandHandler(this , client , this._commandsDir)
 
-        if(this._listenersDir){
-            new ListenerHandler(client , this._listenersDir)
+        if(this._featuresDir){
+            new FeatureHandler(client , this._featuresDir)
         }
 
         setTimeout(() => {

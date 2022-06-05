@@ -11,4 +11,4 @@ var disabledCommands = new mongoose_1.default.Schema({
     guildId: requiredStr,
     command: requiredStr
 });
-module.exports = mongoose_1.default.model('commandingjs-disable-commands', disabledCommands);
+module.exports = mongoose_1.default.model('commandingjs-disabled-commands', disabledCommands);

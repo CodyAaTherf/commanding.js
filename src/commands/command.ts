@@ -1,5 +1,6 @@
 import { Client , Message } from 'discord.js'
 import commandingjs from '..'
+import disabledCommands from '../models/disabled-commands'
 import commandStatus from '../models/disabled-commands'
 
 export = {
@@ -48,7 +49,7 @@ export = {
                         return
                     }
 
-                    await commandStatus.deleteOne({
+                    await disabledCommands.deleteOne({
                         guildId: guild.id ,
                         command: mainCommand
                     })
@@ -63,7 +64,7 @@ export = {
                         return
                     }
 
-                    await new commandStatus({
+                    await new disabledCommands({
                         guildId: guild.id ,
                         command: mainCommand
                     }).save()

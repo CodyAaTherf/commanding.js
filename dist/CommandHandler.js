@@ -113,9 +113,19 @@ var CommandHandler = /** @class */ (function () {
     }
     CommandHandler.prototype.registerCommand = function (instance, client, file) {
         var configuration = require(file);
-        var name = configuration.name, commands = configuration.commands, aliases = configuration.aliases, callback = configuration.callback, execute = configuration.execute, descripion = configuration.descripion;
-        if (callback && execute) {
-            throw new Error('Commands can have either "callback" or "execute"');
+        var name = configuration.name, commands = configuration.commands, aliases = configuration.aliases, callback = configuration.callback, execute = configuration.execute, run = configuration.run, description = configuration.description;
+        // if(callback && execute){
+        //     throw new Error('Commands can have either "callback" or "execute"')
+        // }
+        var callBackCounter = 0;
+        if (callback)
+            ++callBackCounter;
+        if (execute)
+            ++callBackCounter;
+        if (run)
+            ++callBackCounter;
+        if (callBackCounter > 1) {
+            throw new Error("Commands can have either \"callback\" , \"execute\" or \"run\".");
         }
         var names = commands || aliases || [];
         if (!name && (!names || names.length === 0)) {
@@ -127,10 +137,10 @@ var CommandHandler = /** @class */ (function () {
         if (name && !names.includes(name.toLowerCase())) {
             names.unshift(name.toLowerCase());
         }
-        if (!descripion) {
+        if (!description) {
             console.warn("Command \"" + names[0] + "\" does not have \"description\" property.");
         }
-        var hasCallback = callback || execute;
+        var hasCallback = callback || execute || run;
         if (hasCallback) {
             var command = new Command_1.default(instance, client, names, callback || execute, configuration);
             for (var _i = 0, names_1 = names; _i < names_1.length; _i++) {

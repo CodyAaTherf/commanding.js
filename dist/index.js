@@ -40,16 +40,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 var path_1 = __importDefault(require("path"));
 var CommandHandler_1 = __importDefault(require("./CommandHandler"));
-var ListenerHandler_1 = __importDefault(require("./ListenerHandler"));
+var FeatureHandler_1 = __importDefault(require("./FeatureHandler"));
 var mongo_1 = __importDefault(require("./mongo"));
 var get_all_files_1 = __importDefault(require("./get-all-files"));
 var prefixes_1 = __importDefault(require("./models/prefixes"));
 var commandingjs = /** @class */ (function () {
-    function commandingjs(client, commandsDir, listenerDir) {
+    function commandingjs(client, commandsDir, featureDir) {
         var _this = this;
         this._defaultPrefix = '>';
         this._commandsDir = 'commands';
-        this._listenersDir = '';
+        this._featuresDir = '';
         this._mongo = '';
         this._syntaxError = 'Wrong Syntax!';
         this._prefixes = {};
@@ -63,16 +63,16 @@ var commandingjs = /** @class */ (function () {
             var path_2 = module.parent.path;
             if (path_2) {
                 commandsDir = path_2 + "/" + (commandsDir || this._commandsDir);
-                if (listenerDir) {
-                    listenerDir = path_2 + "/" + listenerDir;
+                if (featureDir) {
+                    featureDir = path_2 + "/" + featureDir;
                 }
             }
         }
         this._commandsDir = commandsDir || this._commandsDir;
-        this._listenersDir = listenerDir || this._listenersDir;
+        this._featuresDir = featureDir || this._featuresDir;
         this._commandHandler = new CommandHandler_1.default(this, client, this._commandsDir);
-        if (this._listenersDir) {
-            new ListenerHandler_1.default(client, this._listenersDir);
+        if (this._featuresDir) {
+            new FeatureHandler_1.default(client, this._featuresDir);
         }
         setTimeout(function () {
             if (_this._mongo) {

@@ -96,11 +96,21 @@ class CommandHandler {
             aliases ,
             callback ,
             execute ,
-            descripion
+            run ,
+            description
         } = configuration
 
-        if(callback && execute){
-            throw new Error('Commands can have either "callback" or "execute"')
+        // if(callback && execute){
+        //     throw new Error('Commands can have either "callback" or "execute"')
+        // }
+
+        let callBackCounter = 0
+        if(callback) ++callBackCounter
+        if(execute) ++callBackCounter
+        if(run) ++callBackCounter
+
+        if(callBackCounter > 1){
+            throw new Error(`Commands can have either "callback" , "execute" or "run".`)
         }
 
         let names = commands || aliases || []
@@ -117,11 +127,11 @@ class CommandHandler {
             names.unshift(name.toLowerCase())
         }
 
-        if(!descripion){
+        if(!description){
             console.warn(`Command "${names[0]}" does not have "description" property.`)
         }
 
-        const hasCallback = callback || execute
+        const hasCallback = callback || execute || run
 
         if(hasCallback){
             const command = new Command(
