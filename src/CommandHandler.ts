@@ -44,6 +44,7 @@ class CommandHandler {
                                 if(command){
                                     if(guild){
                                         const isDisabled = instance.commandHandler.isCommandDisabled(guild.id , command.names[0])
+                                        // const isDisabled = instance.commandHandler.isCommandDisabled(guild.id , command.names)
 
                                         if(isDisabled){
                                             message.reply("This command is currectly disabled in this server!")

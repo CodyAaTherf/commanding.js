@@ -59,16 +59,13 @@ class Command {
             args ,
             args.join(' ') ,
             this.client ,
-            // message.guild
-            //     ? this.instance.prefixes[message.guild.id]
-            //     : this.instance.defaultPrefix
             this.instance.getPrefix(message.guild) ,
             this.instance
         )
     }
     
     public get names(): string[] {
-        return this.names
+        return this._names
     }
 
     public get minArgs(): number {

@@ -27,15 +27,11 @@ var Command = /** @class */ (function () {
         }
     }
     Command.prototype.execute = function (message, args) {
-        this._callback(message, args, args.join(' '), this.client, 
-        // message.guild
-        //     ? this.instance.prefixes[message.guild.id]
-        //     : this.instance.defaultPrefix
-        this.instance.getPrefix(message.guild), this.instance);
+        this._callback(message, args, args.join(' '), this.client, this.instance.getPrefix(message.guild), this.instance);
     };
     Object.defineProperty(Command.prototype, "names", {
         get: function () {
-            return this.names;
+            return this._names;
         },
         enumerable: false,
         configurable: true

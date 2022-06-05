@@ -81,6 +81,7 @@ var CommandHandler = /** @class */ (function () {
                                 if (command) {
                                     if (guild) {
                                         var isDisabled = instance.commandHandler.isCommandDisabled(guild.id, command.names[0]);
+                                        // const isDisabled = instance.commandHandler.isCommandDisabled(guild.id , command.names)
                                         if (isDisabled) {
                                             message.reply("This command is currectly disabled in this server!");
                                             return;

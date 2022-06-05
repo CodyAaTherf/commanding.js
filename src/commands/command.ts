@@ -3,8 +3,8 @@ import commandingjs from '..'
 import commandStatus from '../models/disabled-commands'
 
 export = {
-    name: 'commands' ,
-    commands: 'commands' ,
+    name: 'command' ,
+    commands: 'command' ,
     minArgs: 2 ,
     maxArgs: 2 ,
     expectedArgs: '<enable | disable> <Command Name>' ,
