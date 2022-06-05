@@ -95,7 +95,7 @@ var CommandHandler = /** @class */ (function () {
                                     for (var _i = 0, requiredPermissions_1 = requiredPermissions; _i < requiredPermissions_1.length; _i++) {
                                         var perm = requiredPermissions_1[_i];
                                         // @ts-ignore
-                                        if (!(member === null || member === void 0 ? void 0 : member.hasPermission(perm))) {
+                                        if (!(member === null || member === void 0 ? void 0 : member.permissions.any(perm))) {
                                             message.reply("You must have \"" + perm + "\" to use this command.");
                                             return;
                                         }

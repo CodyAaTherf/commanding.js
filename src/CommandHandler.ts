@@ -62,7 +62,7 @@ class CommandHandler {
 
                                     for(const perm of requiredPermissions){
                                         // @ts-ignore
-                                        if(!member?.hasPermission(perm)){
+                                        if(!member?.permissions.any(perm)){
                                             message.reply(`You must have "${perm}" to use this command.`)
 
                                             return
