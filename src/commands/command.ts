@@ -10,6 +10,7 @@ export = {
     maxArgs: 2 ,
     expectedArgs: '<enable | disable> <Command Name>' ,
     description: 'Enable or Disable any command.' ,
+    requiredPermissions: ['ADMINISTRATOR'] ,
     callback: async(
         message: Message ,
         args: string[] ,
