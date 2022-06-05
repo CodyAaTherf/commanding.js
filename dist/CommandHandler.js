@@ -51,6 +51,7 @@ var fs_1 = __importDefault(require("fs"));
 var Command_1 = __importDefault(require("./Command"));
 var get_all_files_1 = __importDefault(require("./get-all-files"));
 var disabled_commands_1 = __importDefault(require("./models/disabled-commands"));
+var permissions_1 = __importDefault(require("./permissions"));
 var CommandHandler = /** @class */ (function () {
     function CommandHandler(instance, client, dir) {
         var _this = this;
@@ -87,8 +88,18 @@ var CommandHandler = /** @class */ (function () {
                                             return;
                                         }
                                     }
-                                    var minArgs = command.minArgs, maxArgs = command.maxArgs, expectedArgs = command.expectedArgs;
-                                    var _a = command.syntaxError, syntaxError = _a === void 0 ? instance.syntaxError : _a;
+                                    // const { minArgs , maxArgs , expectedArgs } = command
+                                    var member = message.member;
+                                    var minArgs = command.minArgs, maxArgs = command.maxArgs, expectedArgs = command.expectedArgs, _a = command.requiredPermissions, requiredPermissions = _a === void 0 ? [] : _a;
+                                    var _b = command.syntaxError, syntaxError = _b === void 0 ? instance.syntaxError : _b;
+                                    for (var _i = 0, requiredPermissions_1 = requiredPermissions; _i < requiredPermissions_1.length; _i++) {
+                                        var perm = requiredPermissions_1[_i];
+                                        // @ts-ignore
+                                        if (!(member === null || member === void 0 ? void 0 : member.hasPermission(perm))) {
+                                            message.reply("You must have \"" + perm + "\" to use this command.");
+                                            return;
+                                        }
+                                    }
                                     if ((minArgs !== undefined && args.length < minArgs) ||
                                         (maxArgs !== undefined && maxArgs !== -1 && args.length > maxArgs)) {
                                         if (syntaxError) {
@@ -113,10 +124,7 @@ var CommandHandler = /** @class */ (function () {
     }
     CommandHandler.prototype.registerCommand = function (instance, client, file) {
         var configuration = require(file);
-        var name = configuration.name, commands = configuration.commands, aliases = configuration.aliases, callback = configuration.callback, execute = configuration.execute, run = configuration.run, description = configuration.description;
-        // if(callback && execute){
-        //     throw new Error('Commands can have either "callback" or "execute"')
-        // }
+        var name = configuration.name, commands = configuration.commands, aliases = configuration.aliases, callback = configuration.callback, execute = configuration.execute, run = configuration.run, description = configuration.description, requiredPermissions = configuration.requiredPermissions;
         var callBackCounter = 0;
         if (callback)
             ++callBackCounter;
@@ -140,11 +148,19 @@ var CommandHandler = /** @class */ (function () {
         if (!description) {
             console.warn("Command \"" + names[0] + "\" does not have \"description\" property.");
         }
+        if (requiredPermissions) {
+            for (var _i = 0, requiredPermissions_2 = requiredPermissions; _i < requiredPermissions_2.length; _i++) {
+                var perm = requiredPermissions_2[_i];
+                if (!permissions_1.default.includes(perm)) {
+                    throw new Error("File \"" + file + "\" has an invalid permission , \"" + perm + "\"");
+                }
+            }
+        }
         var hasCallback = callback || execute || run;
         if (hasCallback) {
             var command = new Command_1.default(instance, client, names, callback || execute, configuration);
-            for (var _i = 0, names_1 = names; _i < names_1.length; _i++) {
-                var name_2 = names_1[_i];
+            for (var _a = 0, names_1 = names; _a < names_1.length; _a++) {
+                var name_2 = names_1[_a];
                 this._commands.set(name_2.toLowerCase(), command);
             }
         }

@@ -6,6 +6,7 @@ import Command from './Command'
 import getAllFiles from './get-all-files'
 import ICommand from './interfaces/ICommand'
 import disabledCommands from './models/disabled-commands'
+import permissions from './permissions'
 
 class CommandHandler {
     private _commands: Map<String , Command> = new Map()
@@ -53,8 +54,20 @@ class CommandHandler {
                                         }
                                     }
 
-                                    const { minArgs , maxArgs , expectedArgs } = command
+                                    // const { minArgs , maxArgs , expectedArgs } = command
+                                    const { member } = message
+                                    const { minArgs , maxArgs , expectedArgs , requiredPermissions = [] } = command                                  
+
                                     let { syntaxError = instance.syntaxError } = command
+
+                                    for(const perm of requiredPermissions){
+                                        // @ts-ignore
+                                        if(!member?.hasPermission(perm)){
+                                            message.reply(`You must have "${perm}" to use this command.`)
+
+                                            return
+                                        }
+                                    }
 
                                     if(
                                         (minArgs !== undefined && args.length < minArgs) ||
@@ -97,12 +110,9 @@ class CommandHandler {
             callback ,
             execute ,
             run ,
-            description
+            description ,
+            requiredPermissions
         } = configuration
-
-        // if(callback && execute){
-        //     throw new Error('Commands can have either "callback" or "execute"')
-        // }
 
         let callBackCounter = 0
         if(callback) ++callBackCounter
@@ -129,6 +139,14 @@ class CommandHandler {
 
         if(!description){
             console.warn(`Command "${names[0]}" does not have "description" property.`)
+        }
+
+        if(requiredPermissions){
+            for(const perm of requiredPermissions){
+                if(!permissions.includes(perm)){
+                    throw new Error(`File "${file}" has an invalid permission , "${perm}"`)
+                }
+            }
         }
 
         const hasCallback = callback || execute || run

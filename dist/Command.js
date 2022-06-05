@@ -1,11 +1,10 @@
 "use strict";
 var Command = /** @class */ (function () {
     function Command(instance, client, names, callback, _a) {
-        var minArgs = _a.minArgs, maxArgs = _a.maxArgs, syntaxError = _a.syntaxError, expectedArgs = _a.expectedArgs, description = _a.description;
+        var minArgs = _a.minArgs, maxArgs = _a.maxArgs, syntaxError = _a.syntaxError, expectedArgs = _a.expectedArgs, description = _a.description, requiredPermissions = _a.requiredPermissions;
         this._names = [];
         this._minArgs = 0;
         this._maxArgs = -1;
-        this._cooldown = [];
         this._callback = function () { };
         this.instance = instance;
         this.client = client;
@@ -15,6 +14,7 @@ var Command = /** @class */ (function () {
         this._syntaxError = syntaxError;
         this._expectedArgs = expectedArgs;
         this._description = description;
+        this._requiredPermissions = requiredPermissions;
         this._callback = callback;
         if (this._minArgs < 0) {
             throw new Error("Command \"" + names[0] + "\" cannon have a minimum arg count less than 0");
@@ -71,18 +71,25 @@ var Command = /** @class */ (function () {
         enumerable: false,
         configurable: true
     });
-    Command.prototype.setCooldown = function (member, seconds) {
-        if (typeof member !== 'string') {
-            member = member.id;
-        }
-        console.log("Setting Cooldown of " + member + " for " + seconds + "s");
-    };
-    Command.prototype.clearCooldown = function (member) {
-        if (typeof member !== 'string') {
-            member = member.id;
-        }
-        console.log("Clearning Cooldown of " + member);
-    };
+    Object.defineProperty(Command.prototype, "requiredPermissions", {
+        // public setCooldown(member: GuildMember | string , seconds: number){
+        //     if(typeof member !== 'string'){
+        //         member = member.id
+        //     }
+        //     console.log(`Setting Cooldown of ${member} for ${seconds}s`)
+        // }
+        // public clearCooldown(member: GuildMember | string){
+        //     if(typeof member !== 'string'){
+        //         member = member.id
+        //     }
+        //     console.log(`Clearning Cooldown of ${member}`)
+        // }
+        get: function () {
+            return this._requiredPermissions;
+        },
+        enumerable: false,
+        configurable: true
+    });
     Object.defineProperty(Command.prototype, "callback", {
         get: function () {
             return this._callback;

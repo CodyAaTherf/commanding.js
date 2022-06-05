@@ -8,6 +8,7 @@ interface configuration{
     syntaxError?: string
     expectedArgs?: string
     description?: string
+    requiredPermissions?: string
     callback: Function
 }
 
@@ -20,7 +21,7 @@ class Command {
     private _syntaxError?: string
     private _expectedArgs?: string
     private _description?: string
-    private _cooldown: string[] = []
+    private _requiredPermissions?: string
     private _callback: Function = () => {}
 
     constructor(
@@ -28,7 +29,7 @@ class Command {
         client: Client ,
         names: string[] ,
         callback: Function ,
-        { minArgs , maxArgs , syntaxError , expectedArgs , description }: configuration
+        { minArgs , maxArgs , syntaxError , expectedArgs , description , requiredPermissions }: configuration
     ){
         this.instance = instance
         this.client = client
@@ -38,6 +39,7 @@ class Command {
         this._syntaxError = syntaxError
         this._expectedArgs = expectedArgs
         this._description = description
+        this._requiredPermissions = requiredPermissions
         this._callback = callback
 
         if(this._minArgs < 0){
@@ -88,20 +90,24 @@ class Command {
         return this._description
     }
 
-    public setCooldown(member: GuildMember | string , seconds: number){
-        if(typeof member !== 'string'){
-            member = member.id
-        }
+    // public setCooldown(member: GuildMember | string , seconds: number){
+    //     if(typeof member !== 'string'){
+    //         member = member.id
+    //     }
 
-        console.log(`Setting Cooldown of ${member} for ${seconds}s`)
-    }
+    //     console.log(`Setting Cooldown of ${member} for ${seconds}s`)
+    // }
 
-    public clearCooldown(member: GuildMember | string){
-        if(typeof member !== 'string'){
-            member = member.id
-        }
+    // public clearCooldown(member: GuildMember | string){
+    //     if(typeof member !== 'string'){
+    //         member = member.id
+    //     }
 
-        console.log(`Clearning Cooldown of ${member}`)
+    //     console.log(`Clearning Cooldown of ${member}`)
+    // }
+
+    public get requiredPermissions(): string | undefined{
+        return this._requiredPermissions
     }
 
     public get callback(): Function{
